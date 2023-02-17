@@ -1,0 +1,160 @@
+clusterName: cluster-0
+talosVersion: v1.3.4
+kubernetesVersion: v1.26.1
+endpoint: https://cluster-0.${domainName}:6443
+
+domain: cluster.local
+allowSchedulingOnMasters: true
+additionalApiServerCertSans:
+  - ${clusterEndpointIP}
+additionalMachineCertSans:
+  - ${clusterEndpointIP}
+  - cluster-0.${domainName}
+cniConfig:
+  name: none
+#clusterPodNets:
+#  - 10.244.0.0/16
+#clusterSvcNets:
+#  - 10.96.0.0/12
+#cniConfig:
+#  name: custom
+#  urls:
+#    - https://raw.githubusercontent.com/bjw-s/home-ops/main/infrastructure/talos/cluster-0/cni/install.yaml
+nodes:
+  - hostname: k8s-control-plane-0.${domainName}
+    ipAddress: 192.168.14.10
+    installDisk: /dev/sda
+    controlPlane: true
+#    networkInterfaces:
+#      - interface: eth0
+#        dhcp: true
+#        addresses:
+#          - 192.168.14.10/24
+#        routes:
+#          - network: 0.0.0.0/0
+#            gateway: 192.168.14.1
+#        vip:
+#          ip: 192.168.14.254
+#        vlans:
+#          - vlanId: 14
+#            dhcp: false
+#            addresses:
+#              - 192.168.14.10/24
+#            vip:
+#              ip: 192.168.14.254
+#    nameservers:
+#      - 192.168.14.1
+
+  - hostname: k8s-control-plane-1.${domainName}
+    ipAddress: 192.168.14.11
+    controlPlane: true
+    installDisk: /dev/sda
+#    networkInterfaces:
+#      - interface: eth0
+#        dhcp: true
+#        vip:
+#          ip: 192.168.14.254
+
+  - hostname: k8s-control-plane-2.${domainName}
+    ipAddress: 192.168.14.12
+    controlPlane: true
+    installDisk: /dev/sda
+#    networkInterfaces:
+#      - interface: eth0
+#        dhcp: true
+#        vip:
+#          ip: 192.168.14.254
+
+  - hostname: k8s-worker-0.${domainName}
+    ipAddress: 192.168.14.13
+    controlPlane: false
+    installDisk: /dev/sda
+#    networkInterfaces:
+#      - interface: eth0
+#        dhcp: true
+#        addresses:
+#          - 192.168.14.13/24
+#        routes:
+#          - network: 0.0.0.0/0
+#            gateway: 192.168.14.1
+#        vlans:
+#          - vlanId: 14
+#            dhcp: false
+#            addresses:
+#              - 192.168.14.13/24
+#    nameservers:
+#      - 192.168.14.1
+  - hostname: k8s-worker-1.${domainName}
+    ipAddress: 192.168.14.14
+    controlPlane: false
+    installDisk: /dev/sda
+#    networkInterfaces:
+#      - interface: eth0
+#        dhcp: true
+
+controlPlane:
+  inlinePatch:
+    cluster:
+      extraManifests:
+        - "https://raw.githubusercontent.com/mologie/talos-vmtoolsd/master/deploy/unstable.yaml"
+#      controllerManager:
+#        extraArgs:
+#          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+#      discovery:
+#        registries:
+#          service:
+#            disabled: true
+      proxy:
+        disabled: true
+        extraArgs:
+          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+#      scheduler:
+#        extraArgs:
+#          feature-gates: MixedProtocolLBService=true,EphemeralContainers=True
+    machine:
+#      files:
+#        - content: |
+#            [plugins]
+#              [plugins."io.containerd.grpc.v1.cri"]
+#                enable_unprivileged_ports = true
+#                enable_unprivileged_icmp = true
+#          path: /etc/cri/conf.d/20-customization.part
+#          op: create
+#      kubelet:
+#        extraArgs:
+#          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+#          rotate-server-certificates: "true"
+      network:
+        interfaces:
+          - interface: eth0
+            dhcp: true
+            vip:
+              ip: 192.168.14.254
+        extraHostEntries:
+          - ip: ${clusterEndpointIP}
+            aliases:
+              - cluster-0.${domainName}
+      sysctls:
+        fs.inotify.max_user_watches: "1048576"
+        fs.inotify.max_user_instances: "8192"
+      time:
+        disabled: false
+        servers:
+          - 192.168.14.1
+
+worker:
+  inlinePatch:
+    machine:
+#      kubelet:
+#        extraArgs:
+#          feature-gates: GracefulNodeShutdown=true,MixedProtocolLBService=true
+#          rotate-server-certificates: "true"
+      network:
+        extraHostEntries:
+          - ip: ${clusterEndpointIP}
+            aliases:
+              - cluster-0.${domainName}
+      time:
+        disabled: false
+        servers:
+          - 192.168.14.1
