@@ -1,3 +1,5 @@
+hubble:
+  enabled: false
 kubeProxyReplacement: strict
 k8sServiceHost: cluster-0.explorer
 k8sServicePort: 6443
