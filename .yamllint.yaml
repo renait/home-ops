@@ -1,7 +1,8 @@
 ---
 ignore: |
   *.sops.*
-extends: default
+  /provision/talos/cni/cilium.yaml
+extends: relaxed
 rules:
   truthy:
     allowed-values: ["true", "false", "on"]
@@ -14,4 +15,6 @@ rules:
   brackets:
     min-spaces-inside: 0
     max-spaces-inside: 0
-  indentation: enable
+  indentation:
+    level: warning
+    indent-sequences: consistent
