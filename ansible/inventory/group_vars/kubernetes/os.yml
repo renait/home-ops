@@ -1,9 +1,10 @@
 ---
 # (string) Timezone for the servers
-# timezone: "America/New_York"
+timezone: "Europe/Amsterdam"
 
 # (list) Additional ssh public keys to add to the nodes
-# ssh_authorized_keys:
+public_ssh_keys:
+  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEpfiZzxO1X6kObMrLanMSX6nKo5ozCho39vX4PuA3/j eopg@roelof-B550-AORUS"
 
 fedora:
   packages:

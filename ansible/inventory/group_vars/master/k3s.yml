@@ -9,7 +9,10 @@ k3s_control_node: true
 k3s_server:
   node-ip: "{{ ansible_host }}"
   tls-san:
-    - "{{ kubevip_address }}"
+    - "{{ k3s_registration_address }}" # IP to HAProxy on router
+    - cluster-0.explorer # Hostname to HAProxy on router
+    - cluster-0.renait.nl # Hostname to HAProxy on router
+  https-listen-port: 6443
   # Disable Docker - this will use the default containerd CRI
   docker: false
   flannel-backend: "none" # This needs to be in quotes
@@ -26,17 +29,19 @@ k3s_server:
     - traefik
   disable-network-policy: true
   disable-cloud-controller: true
+  disable-kube-proxy: true # Disable when using eBPF
   write-kubeconfig-mode: "644"
   # Network CIDR to use for pod IPs
-  cluster-cidr: "10.42.0.0/16"
+  cluster-cidr: "10.244.0.0/16"
   # Network CIDR to use for service IPs
-  service-cidr: "10.43.0.0/16"
+  service-cidr: "10.96.0.0/12"
   kube-controller-manager-arg:
     # Required to monitor kube-controller-manager with kube-prometheus-stack
     - "bind-address=0.0.0.0"
-  kube-proxy-arg:
-    # Required to monitor kube-proxy with kube-prometheus-stack
-    - "metrics-bind-address=0.0.0.0"
+  # Enable when not using eBPF
+  #  kube-proxy-arg:
+  #    # Required to monitor kube-proxy with kube-prometheus-stack
+  #    - "metrics-bind-address=0.0.0.0"
   kube-scheduler-arg:
     # Required to monitor kube-scheduler with kube-prometheus-stack
     - "bind-address=0.0.0.0"

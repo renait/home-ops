@@ -7,16 +7,17 @@ spec:
   registry: quay.io
   imagePath: calico
   calicoNetwork:
-    # https://projectcalico.docs.tigera.io/networking/ip-autodetection
-    nodeAddressAutodetectionV4:
-      cidrs:
-        - "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ansible.utils.ipaddr('network/prefix') }}"
-    # Note: The ipPools section cannot be modified post-install.
-    ipPools:
+    bgp: Enabled
+    hostPorts: Disabled
+    linuxDataplane: BPF
+    ipPools: # Note: The ipPools section cannot be modified post-install.
       - blockSize: 26
         cidr: "{{ k3s_server['cluster-cidr'] }}"
-        encapsulation: "VXLANCrossSubnet"
+        encapsulation: "{{ calico_encapsulation }}"
         natOutgoing: Enabled
         nodeSelector: all()
+    nodeAddressAutodetectionV4:
+      cidrs:
+        - "{{ calico_node_cidr }}"
   nodeMetricsPort: 9091
   typhaMetricsPort: 9093
