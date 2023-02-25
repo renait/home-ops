@@ -33,12 +33,45 @@ spec:
     image:
       repository: quay.io/oriedge/k8s_gateway
       tag: v0.3.3
+
+    podAnnotations:
+      configmap.reloader.stakater.com/reload: "k8s-gateway-config"
+
     args: ["-conf", "/etc/coredns/Corefile"]
+
+    configMaps:
+      config:
+        enabled: true
+        data:
+          Corefile: |
+            .:1053 {
+              errors
+              log
+              health {
+                lameduck 5s
+              }
+              ready
+
+              k8s_gateway renait.nl {
+                apex k8s-gateway.networking
+                resources Ingress Service
+                ttl 300
+              }
+
+              loop
+              reload
+              loadbalance
+            }
+
+    serviceAccount:
+      create: true
+      name: *app
+
     service:
       main:
         type: LoadBalancer
-        externalIPs: ["${SVC_K8S_GATEWAY_ADDR}"]
         externalTrafficPolicy: Local
+        loadBalancerIP: "${SVC_K8S_GATEWAY_ADDR}"
         ports:
           http:
             enabled: false
@@ -50,15 +83,15 @@ spec:
             port: 53
             targetPort: 1053
             protocol: UDP
-    serviceMonitor:
-      main:
-        enabled: false
-        endpoints:
-          - port: metrics
-            scheme: http
-            path: /metrics
-            interval: 1m
-            scrapeTimeout: 10s
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: k8s-gateway-config
+        mountPath: /etc/coredns
+        readOnly: true
+
     probes:
       readiness:
         custom: true
@@ -74,21 +107,11 @@ spec:
             port: 8080
       startup:
         enabled: false
-    serviceAccount:
-      create: true
-      name: *app
-    persistence:
-      config:
-        enabled: true
-        type: configMap
-        name: k8s-gateway-configmap # overriden by kustomizeconfig
-        subPath: Corefile
-        mountPath: /etc/coredns/Corefile
-        readOnly: true
-    topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: kubernetes.io/hostname
-        whenUnsatisfiable: DoNotSchedule
-        labelSelector:
-          matchLabels:
-            app.kubernetes.io/name: *app
+
+#    topologySpreadConstraints:
+#      - maxSkew: 1
+#        topologyKey: kubernetes.io/hostname
+#        whenUnsatisfiable: DoNotSchedule
+#        labelSelector:
+#          matchLabels:
+#            app.kubernetes.io/name: *app
