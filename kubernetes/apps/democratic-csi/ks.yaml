@@ -1,0 +1,40 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-apps-iscsi-hdd
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/democratic-csi/iscsi-hdd/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: iscsi-hdd
+      namespace: democratic-csi
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: cluster-apps-snapshot-controller
+  namespace: flux-system
+spec:
+  path: ./kubernetes/apps/democratic-csi/snapshot-controller/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      name: snapshot-controller
+      namespace: democratic-csi
+  interval: 30m
+  retryInterval: 1m
+  timeout: 3m
