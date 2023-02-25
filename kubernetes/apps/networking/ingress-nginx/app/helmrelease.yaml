@@ -61,15 +61,14 @@ spec:
         ssl-protocols: "TLSv1.3 TLSv1.2"
         use-forwarded-headers: "true"
       metrics:
-        enabled: true
+        enabled: false
         serviceMonitor:
           enabled: true
           namespace: networking
           namespaceSelector:
             any: true
       extraArgs:
-        default-ssl-certificate: |-
-          networking/devbu-io-tls
+        default-ssl-certificate: "networking/${SECRET_DOMAIN/./-}-production-tls"
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
