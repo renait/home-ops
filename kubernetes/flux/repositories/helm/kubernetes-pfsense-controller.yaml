@@ -1,0 +1,9 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: kubernetes-pfsense-controller
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://travisghansen.github.io/kubernetes-pfsense-controller-chart/
