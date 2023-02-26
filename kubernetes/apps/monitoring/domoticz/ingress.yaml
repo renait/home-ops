@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    hajimari.io/enable: "false"
+  name: domoticz
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: &host "domoticz.${SECRET_DOMAIN}"
+      http:
+        paths:
+          - backend:
+              service:
+                name: domoticz
+                port:
+                  number: 80
+            path: /
+            pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - *host
