@@ -8,5 +8,6 @@ resources:
   - ./ingress-nginx/ks.yaml
   - ./k8s-gateway/ks.yaml
   - ./kubernetes-pfsense-controller/ks.yaml
+  - ./multus/ks.yaml
   # Standard resources
-  - ./omada-controller
+  - ./external-services
