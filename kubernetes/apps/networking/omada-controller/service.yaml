@@ -5,5 +5,4 @@ metadata:
   name: omada-controller
 spec:
   type: ExternalName
-  externalIPs: ["192.168.2.40"]
-  # externalName: lnx-srv01.explorer
+  externalName: lnx-srv01.explorer
