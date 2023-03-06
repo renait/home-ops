@@ -5,4 +5,4 @@ resources:
   - ./namespace.yaml
   - ./kubernetes-dashboard/ks.yaml
   # Standard resources
-  - ./domoticz
+  - ./external-services

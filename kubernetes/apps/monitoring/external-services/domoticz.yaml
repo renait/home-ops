@@ -1,0 +1,44 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: domoticz
+  labels:
+    app.kubernetes.io/name: domoticz
+    app.kubernetes.io/instance: domoticz
+spec:
+  type: ExternalName
+  externalName: lnx-srv01.explorer
+  ports:
+    - name: http
+      port: &port 80
+      protocol: TCP
+      targetPort: *port
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: domoticz
+  annotations:
+    hajimari.io/enable: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+  labels:
+    app.kubernetes.io/name: domoticz
+    app.kubernetes.io/instance: domoticz
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: &host "domoticz.${SECRET_DOMAIN}"
+      http:
+        paths:
+          - backend:
+              service:
+                name: domoticz
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - *host
