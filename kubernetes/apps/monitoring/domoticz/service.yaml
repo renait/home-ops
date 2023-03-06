@@ -5,4 +5,5 @@ metadata:
   name: domoticz
 spec:
   type: ExternalName
-  externalName: lnx-srv01.explorer
+  externalIPs: ["192.168.2.40"]
+  # externalName: lnx-srv01.explorer
