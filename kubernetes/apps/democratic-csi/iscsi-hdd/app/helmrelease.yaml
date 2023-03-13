@@ -187,7 +187,7 @@ spec:
           # default is "{{ name }}"
           nameTemplate: >-
             {{ parameters.[csi.storage.k8s.io/pvc/namespace] }}-{{ parameters.[csi.storage.k8s.io/pvc/name] }}
-          namePrefix: csi-
+          namePrefix: csi-0-
           nameSuffix:
           # add as many as needed
           targetGroups:
