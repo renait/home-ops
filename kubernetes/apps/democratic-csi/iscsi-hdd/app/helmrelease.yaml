@@ -32,6 +32,7 @@ spec:
       name: org.democratic-csi.iscsi-hdd
 
     csiProxy:
+      image: docker.io/democraticcsi/csi-grpc-proxy:v0.5.3
       resources:
         requests:
           cpu: 15m
@@ -42,6 +43,7 @@ spec:
     controller:
       # democratic-csi controller
       driver:
+        image: docker.io/democraticcsi/democratic-csi:v1.8.1
         logLevel: debug
         resources:
           requests:
@@ -80,6 +82,7 @@ spec:
     node:
       # democratic-csi node
       driver:
+        image: docker.io/democraticcsi/democratic-csi:v1.8.1
         logLevel: debug
         resources:
           requests:
