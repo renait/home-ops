@@ -9,6 +9,7 @@ resources:
   - ./democratic-csi.yaml
   - ./external-dns.yaml
   - ./hajimari.yaml
+  - ./helm-openldap.yaml
   - ./ingress-nginx.yaml
   - ./intel.yaml
   - ./jetstack.yaml
