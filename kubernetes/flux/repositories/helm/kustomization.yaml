@@ -15,8 +15,9 @@ resources:
   - ./jetstack.yaml
   - ./k8s-gateway.yaml
   - ./kubernetes-dashboard.yaml
+  - ./kubernetes-pfsense-controller.yaml
   - ./metallb.yaml
   - ./metrics-server.yaml
+  - ./oauth2-proxy.yaml
   - ./stakater.yaml
   - ./weave-gitops.yaml
-  - ./kubernetes-pfsense-controller.yaml
