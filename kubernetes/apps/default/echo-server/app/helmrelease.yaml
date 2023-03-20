@@ -56,6 +56,9 @@ spec:
         enabled: true
         ingressClassName: nginx
         annotations:
+          nginx.ingress.kubernetes.io/auth-url: "https://oauth.${SECRET_DOMAIN}/oauth2/auth?allowed_groups=admins"
+          nginx.ingress.kubernetes.io/auth-signin: "https://oauth.${SECRET_DOMAIN}/oauth2/start?rd=$scheme://$best_http_host$request_uri"
+          nginx.ingress.kubernetes.io/auth-response-headers: "x-auth-request-email, x-auth-request-groups"
           external-dns.alpha.kubernetes.io/target: "ipv4.${SECRET_DOMAIN}"
           hajimari.io/icon: video-input-antenna
         hosts:
