@@ -11,9 +11,15 @@ spec:
   concurrency: 1
   nodeSelector:
     matchExpressions:
+      - {key: k3s-upgrade, operator: Exists}
+      - {key: k3s-upgrade, operator: NotIn, values: ["disabled", "false"]}
+      - {key: k3os.io/mode, operator: DoesNotExist}
       - {key: node-role.kubernetes.io/control-plane, operator: DoesNotExist}
   prepare:
     image: rancher/k3s-upgrade
     args: ["prepare", "server"]
+  drain:
+    force: true
+    skipWaitForDeleteTimeout: 60 # 1.18+ (honor pod disruption budgets up to 60 seconds per pod then moves on)
   upgrade:
     image: rancher/k3s-upgrade
