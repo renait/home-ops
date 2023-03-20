@@ -1,0 +1,149 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: &app renait-ldap
+  namespace: security
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: openldap-stack-ha
+      version: 4.1.1
+      sourceRef:
+        kind: HelmRepository
+        name: helm-openldap
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    global:
+      ldapDomain: "${SECRET_DOMAIN}"
+      existingSecret: renait-ldap-secret
+
+    nameOverride: *app
+
+    replicaCount: 1
+      # When a StatefulSet's .spec.updateStrategy.type is set to OnDelete,
+      # the StatefulSet controller will not automatically update the Pods
+      # in a StatefulSet. Users must manually delete Pods to cause the
+      # controller to create new Pods that reflect modifications made
+      # to a StatefulSet's .spec.template.
+      #
+      # type: OnDelete
+      #
+      # or
+      #
+      # When a StatefulSet's .spec.updateStrategy.type is set to RollingUpdate,
+      # the StatefulSet controller will delete and recreate each Pod in the StatefulSet.
+      # It will proceed in the same order as Pod termination (from the largest ordinal
+    # to the smallest), updating each Pod one at a time. It will wait until an updated
+    # Pod is Running and Ready prior to updating its predecessor.
+    #
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        partition: 1
+
+    # Set the container log level
+    # Valid log levels: none, error, warning, info (default), debug, trace
+    logLevel: info
+
+    # Settings for enabling TLS with custom certificate
+    # need a secret with tls.crt, tls.key and ca.crt keys with associated files
+    # Ref: https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kubectl/#create-a-secret
+    customTLS:
+      enabled: false
+
+    # Default configuration for openldap as environment variables. These get injected directly in the container.
+    # Use the env variables from https://github.com/osixia/docker-openldap#beginner-guide
+    env: {}
+
+    ## Existing configmap with custom ldif
+    # Can't be use with customLdifFiles
+    # Same format as customLdifFiles
+    customLdifCm: renait-ldap-customldif
+
+    # Custom openldap ACLs
+    customAcls: |-
+      dn: olcDatabase={2}mdb,cn=config
+      changetype: modify
+      replace: olcAccess
+      olcAccess: {0}to attrs=userPassword,shadowLastChange
+        by self write
+        by dn="cn=admin,dc=renait,dc=nl" write
+        by group.exact="cn=admins,ou=groups,dc=renait,dc=nl" write
+        by anonymous auth
+        by * none
+      olcAccess: {1}to *
+        by dn="cn=admin,dc=renait,dc=nl" write
+        by group.exact="cn=admins,ou=groups,dc=renait,dc=nl" write
+        by dn.children="ou=system,dc=renait,dc=nl" read
+        by self read
+        by * none
+
+    replication:
+      enabled: false
+
+    ## Persist data to a persistent volume
+    persistence:
+      enabled: true
+      ## database data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      ##
+      storageClass: "freenas-iscsi-ssd"
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+      # existingClaim: ""
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 20Mi
+      limits:
+        cpu: 50m
+        memory: 40Mi
+
+    ltb-passwd:
+      enabled: false
+
+    phpldapadmin:
+      enabled: true
+      env:
+        PHPLDAPADMIN_LDAP_CLIENT_TLS_REQCERT: "never"
+
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          kubernetes.io/tls-acme: "true"
+        path: /
+        pathType: Prefix
+        hosts:
+          - &host "ldapadmin2.${SECRET_DOMAIN}"
+        tls:
+          - hosts:
+              - *host
+
+      resources:
+        requests:
+          cpu: 10m
+          memory: 50Mi
+        limits:
+          cpu: 100m
+          memory: 100Mi

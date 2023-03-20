@@ -1,0 +1,160 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helmrelease_v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: keycloak
+  namespace: security
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: keycloak
+      version: 13.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    ## Keycloak authentication parameters
+    ## ref: https://github.com/bitnami/bitnami-docker-keycloak#admin-credentials
+    ##
+    auth:
+      existingSecret: keycloak-secret
+
+    ## Keycloak resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ##
+    resources:
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      requests:
+        cpu: 15m
+        memory: 600Mi
+      limits:
+        cpu: 400m
+        memory: 600Mi
+
+    extraEnvVars:
+      - name: TZ
+        value: "Europe/Amsterdam"
+
+    startupProbe:
+      enabled: true
+      initialDelaySeconds: 60
+    livenessProbe:
+      periodSeconds: 10
+
+    ## Service configuration
+    ##
+    service:
+      ## @param service.type Kubernetes service type
+      ##
+      type: ClusterIP
+
+    ## Ingress configuration
+    ##
+    ingress:
+      ## Set to true to enable ingress record generation
+      ##
+      enabled: true
+
+      ingressClassName: "nginx"
+
+      ## When the ingress is enabled, a host pointing to this will be created
+      ##
+      hostname: &host "auth2.${SECRET_DOMAIN}"
+
+      ## Ingress annotations done as key:value pairs
+      ## For a full list of possible ingress annotations, please see
+      ## ref: https://github.com/kubernetes/ingress-nginx/blob/master/docs/user-guide/nginx-configuration/annotations.md
+      ##
+      ## If certManager is set to true, annotation kubernetes.io/tls-acme: "true" will automatically be set
+      ##
+      annotations:
+        kubernetes.io/tls-acme: "true"
+        nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+
+      ## Enable TLS configuration for the hostname defined at ingress.hostname parameter
+      ## TLS certificates will be retrieved from a TLS secret with name: {{- printf "%s-tls" .Values.ingress.hostname }}
+      ## You can use the ingress.secrets parameter to create this TLS secret, relay on cert-manager to create it, or
+      ## let the chart create self-signed certificates for you
+      ##
+      tls: false
+
+      ## The tls configuration for additional hostnames to be covered with this ingress record.
+      ## see: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+      ## Example:
+      ## extraTls:
+      ## - hosts:
+      ##     - keycloak.local
+      ##   secretName: keycloak.local-tls
+      ##
+      extraTls:
+        - hosts:
+            - *host
+
+    ##
+    ## PostgreSQL chart configuration
+    ## ref: https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml
+    ##
+    postgresql:
+      ## Whether to deploy a postgresql server to satisfy the applications database requirements. To use an external database set this to false and configure the externalDatabase parameters
+      ##
+      enabled: true
+
+      auth:
+        username: bn_keycloak
+        database: bitnami_keycloak
+        existingSecret: keycloak-secret
+
+      primary:
+        persistence:
+          enabled: true
+          ## Persist data to a persistent volume
+
+          ## A manually managed Persistent Volume and Claim
+          ## Requires persistence.enabled: true
+          ## If defined, PVC must be created manually before volume will be bound
+          # existingClaim: data-keycloak-postgresql-0
+
+          ## database data Persistent Volume Storage Class
+          ## If defined, storageClassName: <storageClass>
+          ## If set to "-", storageClassName: "", which disables dynamic provisioning
+          ## If undefined (the default) or set to null, no storageClassName spec is
+          ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+          ##   GKE, AWS & OpenStack)
+          ##
+          #      storageClass: "freenas-iscsi-ssd"
+          #      accessMode: ReadWriteOnce
+          #      size: 1Gi
+          storageClass: "freenas-iscsi-ssd"
+          accessModes:
+            - ReadWriteOnce
+          size: 2Gi
+
+          # annotations: {}
+
+        ## Configure resource requests and limits
+        ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+        ##
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 200m
+          requests:
+            memory: 100Mi
+            cpu: 10m
