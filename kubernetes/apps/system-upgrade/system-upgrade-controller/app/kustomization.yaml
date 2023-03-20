@@ -18,3 +18,8 @@ patchesStrategicMerge:
     kind: Namespace
     metadata:
       name: system-upgrade
+labels:
+  - pairs:
+      app.kubernetes.io/name: system-upgrade-controller
+      app.kubernetes.io/instance: system-upgrade-controller
+    includeSelectors: true
