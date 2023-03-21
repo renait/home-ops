@@ -1,0 +1,84 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: oauth2-proxy
+  namespace: security
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://oauth2-proxy.github.io/manifests
+      chart: oauth2-proxy
+      version: 6.10.1
+      sourceRef:
+        kind: HelmRepository
+        name: oauth2-proxy-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    config:
+      existingSecret: oauth2-proxy-secret
+
+    ingress:
+      enabled: true
+      # annotations:
+      #   kubernetes.io/ingress.class: nginx
+      path: /oauth2
+      hosts:
+        - &host "oauth.${SECRET_DOMAIN}"
+      tls:
+        - hosts:
+            - *host
+
+    extraArgs:
+      provider: oidc
+      oidc-issuer-url: "https://auth2.${SECRET_DOMAIN}/realms/master"
+      email-domain: "*"
+      cookie-domain: &domain ".${SECRET_DOMAIN}"
+      whitelist-domain: *domain
+      pass-authorization-header: true
+      pass-access-token: true
+      pass-user-headers: true
+      set-authorization-header: true
+      set-xauthrequest: true
+      reverse-proxy: true
+
+    extraEnv:
+      - name: TZ
+        value: "${TIMEZONE}"
+
+    # Configure the session storage type, between cookie and redis
+    sessionStorage:
+      # Can be one of the supported session storage cookie|redis
+      type: redis
+      redis:
+        # Name of the Kubernetes secret containing the redis & redis sentinel password values (see also `sessionStorage.redis.passwordKey`)
+        existingSecret: oauth2-proxy-secret
+
+    # Enables and configure the automatic deployment of the redis subchart
+    redis:
+      auth:
+        existingSecret: oauth2-proxy-secret
+
+      # provision an instance of the redis sub-chart
+      enabled: true
+      # Redis specific helm chart settings, please see:
+      # https://github.com/bitnami/charts/tree/master/bitnami/redis#parameters
+      # redisPort: 6379
+      # cluster:
+      #   enabled: false
+      #   slaveCount: 1
+      master:
+        persistence:
+          storageClass: freenas-iscsi-ssd
+          size: 2Gi
+        podAnnotations:
+          secret.reloader.stakater.com/reload: oauth2-proxy-secret
+
+      replica:
+        persistence:
+          storageClass: freenas-iscsi-ssd
+          size: 2Gi
+        podAnnotations:
+          secret.reloader.stakater.com/reload: oauth2-proxy-secret
