@@ -6,6 +6,9 @@ metadata:
   labels:
     substitution.flux.home.arpa/enabled: "true"
 spec:
+  dependsOn:
+    - name: cluster-apps-iscsi-ssd
+    - name: cluster-apps-keycloak
   interval: 10m
   path: "./kubernetes/apps/security/oauth2-proxy/app"
   prune: true
@@ -13,5 +16,3 @@ spec:
     kind: GitRepository
     name: home-kubernetes
   wait: true
-  dependsOn:
-    - name: cluster-apps-iscsi-ssd
