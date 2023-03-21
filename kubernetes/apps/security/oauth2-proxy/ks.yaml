@@ -3,14 +3,12 @@ kind: Kustomization
 metadata:
   name: cluster-apps-oauth2-proxy
   namespace: flux-system
-  labels:
-    substitution.flux.home.arpa/enabled: "true"
 spec:
   dependsOn:
     - name: cluster-apps-iscsi-ssd
     - name: cluster-apps-keycloak
   interval: 10m
-  path: "./kubernetes/apps/security/oauth2-proxy/app"
+  path: ./kubernetes/apps/security/oauth2-proxy/app
   prune: true
   sourceRef:
     kind: GitRepository
