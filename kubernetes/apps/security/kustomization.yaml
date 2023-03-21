@@ -7,3 +7,4 @@ resources:
   # Flux-Kustomizations
   - ./openldap/ks.yaml
   - ./keycloak/ks.yaml
+  - ./oauth2-proxy/ks.yaml
