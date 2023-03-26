@@ -71,7 +71,7 @@ resource "cloudflare_zone_settings_override" "cloudflare_settings" {
 }
 
 data "http" "ipv4" {
-  url = "http://ipv4.icanhazip.com"
+  url = "http://ident.me"
 }
 
 resource "cloudflare_record" "ipv4" {
