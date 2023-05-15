@@ -45,7 +45,6 @@ spec:
         cpu: 15m
         memory: 600Mi
       limits:
-        cpu: 400m
         memory: 600Mi
 
     extraEnvVars:
