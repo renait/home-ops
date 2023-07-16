@@ -31,7 +31,7 @@ spec:
       replicaCount: 2
       extraEnvs:
         - name: TZ
-          value: "${TIMEZONE}"
+          value: "Europe/Amsterdam"
       service:
         externalIPs: ["192.168.19.101"]
         externalTrafficPolicy: Local

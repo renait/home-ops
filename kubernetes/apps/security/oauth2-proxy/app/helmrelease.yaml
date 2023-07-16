@@ -46,7 +46,7 @@ spec:
 
     extraEnv:
       - name: TZ
-        value: "${TIMEZONE}"
+        value: "Europe/Amsterdam"
 
     # Configure the session storage type, between cookie and redis
     sessionStorage:
