@@ -28,7 +28,7 @@ spec:
     keepHistory: false
   values:
     pfsense:
-      url: "https://router.${SECRET_DOMAIN}"
+      url: "https://router.renait.nl"
       insecure: false
 
     config:

@@ -29,7 +29,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: &host "domoticz.${SECRET_DOMAIN}"
+    - host: &host "domoticz.renait.nl"
       http:
         paths:
           - backend:

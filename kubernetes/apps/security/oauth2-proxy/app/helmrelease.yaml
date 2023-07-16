@@ -26,16 +26,16 @@ spec:
       #   kubernetes.io/ingress.class: nginx
       path: /oauth2
       hosts:
-        - &host "oauth.${SECRET_DOMAIN}"
+        - &host "oauth.renait.nl"
       tls:
         - hosts:
             - *host
 
     extraArgs:
       provider: oidc
-      oidc-issuer-url: "https://auth2.${SECRET_DOMAIN}/realms/master"
+      oidc-issuer-url: "https://auth2.renait.nl/realms/master"
       email-domain: "*"
-      cookie-domain: &domain ".${SECRET_DOMAIN}"
+      cookie-domain: &domain ".renait.nl"
       whitelist-domain: *domain
       pass-authorization-header: true
       pass-access-token: true

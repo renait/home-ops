@@ -29,7 +29,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: &host "omada.${SECRET_DOMAIN}"
+    - host: &host "omada.renait.nl"
       http:
         paths:
           - backend:
