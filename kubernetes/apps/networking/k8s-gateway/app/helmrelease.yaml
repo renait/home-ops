@@ -71,7 +71,7 @@ spec:
       main:
         type: LoadBalancer
         externalTrafficPolicy: Local
-        externalIPs: ["${SVC_K8S_GATEWAY_ADDR}"]
+        externalIPs: ["192.168.19.102"]
         ports:
           http:
             enabled: false
