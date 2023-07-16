@@ -8,7 +8,7 @@ spec:
   interval: 30m
   ref:
     branch: main
-  url: "https://github.com/renait/home-ops"
+  url: "${BOOTSTRAP_GIT_REPOSITORY}"
   ignore: |
     # exclude all
     /*
