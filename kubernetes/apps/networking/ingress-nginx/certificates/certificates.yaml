@@ -2,10 +2,10 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: "renait-production"
+  name: "renait-nl-production"
   namespace: networking
 spec:
-  secretName: "renait-production-tls"
+  secretName: "renait-nl-production-tls"
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
@@ -17,10 +17,10 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: "renait-staging"
+  name: "renait-nl-staging"
   namespace: networking
 spec:
-  secretName: "renait-staging-tls"
+  secretName: "renait-nl-staging-tls"
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
