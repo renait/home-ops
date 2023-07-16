@@ -33,7 +33,7 @@ spec:
         - name: TZ
           value: "${TIMEZONE}"
       service:
-        externalIPs: ["${SVC_NGINX_ADDR}"]
+        externalIPs: ["192.168.19.101"]
         externalTrafficPolicy: Local
       ingressClassResource:
         default: true
