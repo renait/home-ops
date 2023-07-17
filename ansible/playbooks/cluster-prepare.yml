@@ -32,6 +32,13 @@
             path: /etc/hosts
             block: |
               127.0.1.1   {{ inventory_hostname }}
+    - name: Netplan
+      template:
+        src: netplan.yaml.j2
+        dest: /etc/netplan/99-netcfg-vmware.yaml
+        owner: root
+        group: root
+        mode: u=rw,g=r,o=r
     - name: Packages | Fedora
       block:
         - name: Packages | Install required packages
