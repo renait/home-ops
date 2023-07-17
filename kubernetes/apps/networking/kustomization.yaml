@@ -10,4 +10,4 @@ resources:
   - ./kubernetes-pfsense-controller/ks.yaml
   # - ./multus/ks.yaml
   # Standard resources
-  - ./external-services
+  # - ./external-services
