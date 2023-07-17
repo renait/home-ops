@@ -58,7 +58,6 @@ spec:
             cpu: 15m
             memory: 40M
           limits:
-            cpu: 15m
             memory: 40M
 
       externalResizer:
@@ -67,7 +66,6 @@ spec:
             cpu: 15m
             memory: 50M
           limits:
-            cpu: 15m
             memory: 50M
 
       externalSnapshotter:
@@ -76,7 +74,6 @@ spec:
             cpu: 15m
             memory: 40M
           limits:
-            cpu: 15m
             memory: 40M
 
     node:
@@ -215,7 +212,6 @@ spec:
           cpu: 25m
           memory: 250M
         limits:
-          cpu: 25m
           memory: 250M
   valuesFrom:
     - kind: Secret
