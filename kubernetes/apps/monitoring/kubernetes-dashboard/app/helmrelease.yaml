@@ -17,7 +17,6 @@ spec:
   maxHistory: 3
   install:
     createNamespace: true
-    skipCRDs: true
     remediation:
       retries: 3
   upgrade:
@@ -47,6 +46,10 @@ spec:
         - hosts:
             - *host
           # secretName: kubernetes-dashboard-tls
+    nginx:
+      enabled: false
+    cert-manager:
+      enabled: false
     metricsScraper:
       enabled: true
     serviceMonitor:
