@@ -7,4 +7,4 @@ resources:
   # - ./vpa/ks.yaml
   # - ./goldilocks/ks.yaml
   # Standard resources
-  - ./external-services
+  # - ./external-services
