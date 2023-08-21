@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: keycloak
-      version: 15.1.8
+      version: 16.0.5
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -32,6 +32,14 @@ spec:
     ##
     auth:
       existingSecret: keycloak-secret
+
+    ## @param production Run Keycloak in production mode. TLS configuration is required except when using proxy=edge.
+    ##
+    production: true
+    ## @param proxy reverse Proxy mode edge, reencrypt, passthrough or none
+    ## ref: https://www.keycloak.org/server/reverseproxy
+    ##
+    proxy: edge
 
     ## Keycloak resource requests and limits
     ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
